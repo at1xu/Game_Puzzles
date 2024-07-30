@@ -1,0 +1,71 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    background-color: #151320;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.button-container {
+    display: flex;
+    gap: 10px; /* Простір між кнопками */
+    margin-bottom: 20px; /* Відступ від нижньої частини контейнера */
+}
+
+.buttonLv {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 7.5em;
+    width: 18.75em;
+    box-shadow: 0 1.25em 2.18em rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 0.31em;
+    background-color: #1c1b29; /* Колір фону кнопки */
+    color: #ffffff; /* Колір тексту */
+    font-size: 1.2em;
+    letter-spacing: 0.1em;
+    transition: background-position 10s linear;
+    margin: 0;
+}
+
+.buttonLv:before {
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: repeating-linear-gradient(
+        to right,
+        #fd004c 2.62em,
+        #fe9000 5.25em,
+        #fff020 7.87em,
+        #3edf4b 10.5em,
+        #3363ff 15.75em,
+        #fd004c 18.75em
+    );
+    background-size: 125em;
+    z-index: -1; /* Позаду тексту */
+}
+
+.buttonLv:hover:before {
+    background-position: -106.25em 0;
+}
+
+.buttonLv span {
+    position: relative;
+    z-index: 1; /* Над фоном */
+}
+
+.carousel {
+    width: 80%;
+    max-width: 600px;
+    margin: auto;
+}

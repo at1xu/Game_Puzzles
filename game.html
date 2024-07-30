@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puzzle Game</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="menu.html">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #carousel-container {
+            margin: 20px 0;
+        }
+        #carousel-indicators {
+            margin-bottom: 10px;
+        }
+        .carousel-item img {
+            width: 200px;
+            height: 200px;
+            cursor: pointer;
+        }
+        #puzzle-container {
+            display: grid;
+            gap: 2px;
+            margin-top: 20px;
+        }
+        .puzzle-piece {
+            width: 100px;
+            height: 100px;
+            background-size: cover;
+            background-position: center;
+            cursor: pointer;
+        }
+        #changeBtn {
+            margin-top: 20px;
+        }
+        #game-container {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="button-container" id="button-container">
+        <button class="btn buttonLv" onclick="showCarousel('easy')">EASY</button>
+        <button class="btn buttonLv" onclick="showCarousel('normal')">NORMAL</button>
+        <button class="btn buttonLv" onclick="showCarousel('hard')">HARD</button>
+    </div>
+
+    <div id="carousel-container">
+        <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" style="display: none;">
+            <ol class="carousel-indicators" id="carousel-indicators"></ol>
+            <div class="carousel-inner" id="carousel-inner"></div>
+            <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <div id="board"></div>
+        <div id="pieces"></div>
+        <button id="changeBtn" class="buttonC">Change Puzzle</button>
+        <h2>Turns: <span id="turns">0</span></h2>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        // Карусель
+        const slidesData = {
+            easy: [
+                {src: "./Images/caruselImage/easy1.jpg", id: "easy1"},
+                {src: "./Images/caruselImage/easy2.jpg", id: "easy2"},
+                {src: "./Images/caruselImage/easy3.jpg", id: "easy3"}
+            ],
+            normal: [
+                {src: "./Images/caruselImage/normal1.jpg", id: "normal1"},
+                {src: "./Images/caruselImage/normal2.jpg", id: "normal2"},
+                {src: "./Images/caruselImage/normal3.jpg", id: "normal3"}
+            ],
+            hard: [
+                {src: "./Images/caruselImage/hard1.jpg", id: "hard1"},
+                {src: "./Images/caruselImage/hard2.jpg", id: "hard2"},
+                {src: "./Images/caruselImage/hard3.jpg", id: "hard3"}
+            ]
+        };
+
+        let selectedImageId = 'easy1'; // Default image
+
+        function showCarousel(level) {
+            const indicators = document.getElementById('carousel-indicators');
+            const inner = document.getElementById('carousel-inner');
+            indicators.innerHTML = '';
+            inner.innerHTML = '';
+
+            slidesData[level].forEach((slide, index) => {
+                // Create carousel indicators
+                const indicator = document.createElement('li');
+                indicator.setAttribute('data-target', '#carouselExampleIndicators');
+                indicator.setAttribute('data-slide-to', index);
+                if (index === 0) indicator.className = 'active';
+                indicators.appendChild(indicator);
+
+                // Create carousel items
+                const item = document.createElement('div');
+                item.className = 'carousel-item';
+                if (index === 0) item.classList.add('active');
+
+                const img = document.createElement('img');
+                img.src = slide.src;
+                img.setAttribute('data-id', slide.id);
+                img.addEventListener('click', () => {
+                    selectedImageId = slide.id;
+                    startPuzzle(selectedImageId);
+                });
+                item.appendChild(img);
+
+                inner.appendChild(item);
+            });
+
+            document.getElementById('carouselExampleIndicators').style.display = 'block';
+            document.getElementById('game-container').style.display = 'none';
+        }
+
+        // Гра пазлів
+        const imageBaseUrls = {
+            easy: "./Images/Easy/",
+            normal: "path/to/cut/normal",
+            hard: "path/to/cut/hard"
+        };
+
+        let rows = 5;
+        let columns = 5;
+        let pieces = [];
+        let currTile;
+        let otherTile;
+        let turns = 0;
+
+        function startPuzzle(imageId) {
+            const level = imageId.split(/(\d+)/)[0]; // Get the level from the imageId
+            const imageBaseUrl = imageBaseUrls[level] || imageBaseUrls['easy']; // Fallback to 'easy' level if level is invalid
+
+            initializeBoard(imageBaseUrl);
+            shufflePieces();
+            createPieces(imageBaseUrl);
+
+            document.getElementById('carouselExampleIndicators').style.display = 'none';
+            document.getElementById('game-container').style.display = 'block';
+            document.getElementById("changeBtn").style.display = 'block';
+        }
+
+        function initializeBoard(imageBaseUrl) {
+            clearBoard();
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < columns; c++) {
+                    let tile = document.createElement("img");
+                    tile.src = `${imageBaseUrl}/blank2.jpg`; // Ensure this path is correct
+                    tile.className = 'puzzle-piece';
+                    
+                    tile.addEventListener("dragstart", dragStart);
+                    tile.addEventListener("dragover", dragOver);
+                    tile.addEventListener("dragenter", dragEnter);
+                    tile.addEventListener("dragleave", dragLeave);
+                    tile.addEventListener("drop", dragDrop);
+                    tile.addEventListener("dragend", dragEnd);
+
+                    document.getElementById("board").append(tile);
+                }
+            }
+        }
+
+        function shufflePieces() {
+            pieces = [];
+            for (let i = 1; i <= rows * columns; i++) {
+                pieces.push(i.toString());
+            }
+            pieces.sort(() => Math.random() - 0.5); // Shuffle array
+        }
+
+        function createPieces(imageBaseUrl) {
+            const piecesContainer = document.getElementById("pieces");
+            while (piecesContainer.firstChild) {
+                piecesContainer.removeChild(piecesContainer.firstChild);
+            }
+
+            for (let i = 0; i < pieces.length; i++) {
+                let tile = document.createElement("img");
+                tile.src = `${imageBaseUrl}/${pieces[i]}.jpg`; // Ensure this path is correct
+                tile.className = 'puzzle-piece';
+
+                tile.addEventListener("dragstart", dragStart);
+                tile.addEventListener("dragover", dragOver);
+                tile.addEventListener("dragenter", dragEnter);
+                tile.addEventListener("dragleave", dragLeave);
+                tile.addEventListener("drop", dragDrop);
+                tile.addEventListener("dragend", dragEnd);
+
+                document.getElementById("pieces").append(tile);
+            }
+        }
+
+        function clearBoard() {
+            let board = document.getElementById("board");
+            while (board.firstChild) {
+                board.removeChild(board.firstChild);
+            }
+        }
+
+        function dragStart() {
+            currTile = this;
+        }
+
+        function dragOver(e) {
+            e.preventDefault();
+        }
+
+        function dragEnter(e) {
+            e.preventDefault();
+        }
+
+        function dragLeave() {}
+
+        function dragDrop() {
+            otherTile = this;
+        }
+
+        function dragEnd() {
+            if (!currTile || !otherTile || currTile.src.includes("blank")) {
+                return;
+            }
+            let currImg = currTile.src;
+            let otherImg = otherTile.src;
+            currTile.src = otherImg;
+            otherTile.src = currImg;
+
+            turns += 1;
+            document.getElementById("turns").innerText = turns;
+        }
+
+        document.getElementById("changeBtn").addEventListener("click", function() {
+            const level = selectedImageId.split(/(\d+)/)[0];
+            const imageBaseUrl = imageBaseUrls[level] || imageBaseUrls['easy'];
+            clearPieces();
+            shufflePieces();
+            initializeBoard(imageBaseUrl);
+            createPieces(imageBaseUrl);
+        });
+
+        function clearPieces() {
+            let piecesContainer = document.getElementById("pieces");
+            while (piecesContainer.firstChild) {
+                piecesContainer.removeChild(piecesContainer.firstChild);
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,32 +1,29 @@
+const imageBaseUrls = {
+    easy: "path/to/cut/easy", // Directory with cut images
+    normal: "path/to/cut/normal",
+    hard: "path/to/cut/hard"
+};
+
 var rows = 5;
 var columns = 5;
 var pieces = [];
-
 var currTile;
 var otherTile;
 var turns = 0;
 
-var imageUrls = ["./Images/Normal/Images-1/", "./Images/Normal/Images-2/", "./Images/Normal/Images-2/"];
-var currentImageUrlIndex = 0;
+const urlParams = new URLSearchParams(window.location.search);
+const imageId = urlParams.get('imageId') || 'easy1'; // Default to 'easy1' if imageId is not found
+const level = imageId.split(/(\d+)/)[0]; // Get the level from the imageId
+const imageBaseUrl = imageBaseUrls[level] || imageBaseUrls['easy']; // Fallback to 'easy' level if level is invalid
 
 window.onload = function() {
     initializeBoard();
     shufflePieces();
     createPieces();
 
-    function changePuzzleImage() {
-        clearPieces();
-        shufflePieces();
-        initializeBoard();
-        createPieces();
-    }
-
     document.getElementById("changeBtn").addEventListener("click", function() {
-        currentImageUrlIndex = (currentImageUrlIndex + 1) % imageUrls.length;
         changePuzzleImage();
     });
-
-
 }
 
 function initializeBoard() {
@@ -34,7 +31,7 @@ function initializeBoard() {
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
             let tile = document.createElement("img");
-            tile.src = "./Images/Normal/Images-1/blank2.jpg";
+            tile.src = `${imageBaseUrl}/blank2.jpg`; // Ensure that this path is correct
 
             tile.addEventListener("dragstart", dragStart);
             tile.addEventListener("dragover", dragOver);
@@ -53,19 +50,13 @@ function shufflePieces() {
     for (let i = 1; i <= rows * columns; i++) {
         pieces.push(i.toString());
     }
-    pieces.reverse();
-    for (let i = 0; i < pieces.length; i++) {
-        let j = Math.floor(Math.random() * pieces.length);
-        let tmp = pieces[i];
-        pieces[i] = pieces[j];
-        pieces[j] = tmp;
-    }
+    pieces.sort(() => Math.random() - 0.5); // Shuffle array
 }
 
 function createPieces() {
     for (let i = 0; i < pieces.length; i++) {
         let tile = document.createElement("img");
-        tile.src = imageUrls[currentImageUrlIndex] + pieces[i] + ".jpg";
+        tile.src = `${imageBaseUrl}/${pieces[i]}.jpg`; // Ensure that this path is correct
 
         tile.addEventListener("dragstart", dragStart);
         tile.addEventListener("dragover", dragOver);
@@ -90,7 +81,6 @@ function clearPieces() {
     while (piecesContainer.firstChild) {
         piecesContainer.removeChild(piecesContainer.firstChild);
     }
-
 }
 
 function dragStart() {
@@ -112,7 +102,7 @@ function dragDrop() {
 }
 
 function dragEnd() {
-    if (currTile.src.includes("blank")) {
+    if (!currTile || !otherTile || currTile.src.includes("blank")) {
         return;
     }
     let currImg = currTile.src;
@@ -124,32 +114,9 @@ function dragEnd() {
     document.getElementById("turns").innerText = turns;
 }
 
-function showGameOptions(rows, columns) {
-    // Створюємо поле гри з вказаними рядками та стовпцями
-    clearBoard();
+function changePuzzleImage() {
     clearPieces();
-    createGameBoard(rows, columns);
-}
-
-function createGameBoard(rows, columns) {
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < columns; c++) {
-            let tile = document.createElement("img");
-            tile.src = "./Images/Normal/Images-1/blank2.jpg";
-
-            tile.addEventListener("dragstart", dragStart);
-            tile.addEventListener("dragover", dragOver);
-            tile.addEventListener("dragenter", dragEnter);
-            tile.addEventListener("dragleave", dragLeave);
-            tile.addEventListener("drop", dragDrop);
-            tile.addEventListener("dragend", dragEnd);
-
-            document.getElementById("board").append(tile);
-        }
-    }
-}
-
-function clearGame() {
-    clearBoard();
-    clearPieces();
+    shufflePieces();
+    initializeBoard();
+    createPieces();
 }

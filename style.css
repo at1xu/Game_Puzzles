@@ -101,7 +101,7 @@ h2{
 }
 
 
-button {
+.buttonC {
   
     margin: 0 auto;
     display: flex;
@@ -117,7 +117,7 @@ button {
     cursor: pointer;
     border-radius: 0.31em;
   }
-  button:before {
+  .buttonC:before {
     content: "";
     height: 100%;
     width: 100%;
@@ -135,7 +135,7 @@ button {
     );
     background-size: 125em;
   }
-  button:after {
+  .buttonC:after {
     content: "change image ";
     position: absolute;
     background-color: #1c1b29;
@@ -151,7 +151,7 @@ button {
     display: grid;
     place-items: center;
   }
-  button:hover:before {
+  .buttonC:hover:before {
     background-position: -106.25em 0;
     transition: 10s linear;
    
