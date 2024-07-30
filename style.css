@@ -154,4 +154,32 @@ button {
   button:hover:before {
     background-position: -106.25em 0;
     transition: 10s linear;
+   
+  }
+  #Hard{
+    margin-top: 270px ;
+    margin-bottom: 10px;
+  }
+  #Hard::after
+  {
+  
+    content: "Hard ";
+
+  }
+  #Normal{
+    margin-bottom: 10px;
+  }
+  #Normal::after
+  {
+   
+    
+    content: "Normal";
+
+  }
+  #Easy::after
+  {
+   
+    
+    content: "Easy";
+
   }

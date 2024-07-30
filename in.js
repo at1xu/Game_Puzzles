@@ -6,50 +6,36 @@ var currTile;
 var otherTile;
 var turns = 0;
 
-var imageUrls = ["./images/","./images/Images-1/", "./images/Images-2/"];
+var imageUrls = ["./Images/Normal/Images-1/", "./Images/Normal/Images-2/", "./Images/Normal/Images-2/"];
 var currentImageUrlIndex = 0;
-
-
 
 window.onload = function() {
     initializeBoard();
     shufflePieces();
     createPieces();
 
-   // Функція для зміни зображення пазлу при натисканні на кнопку
-function changePuzzleImage() {
-    clearPreviousPuzzles(); // Очистити попередні пазли
-    for (let i = 0; i < pieces.length; i++) {
-        let tile = document.createElement("img");
-        tile.src = imageUrls[currentImageUrlIndex] + pieces[i] + ".jpg";
-
-        // DRAG FUNCTIONALITY
-        tile.addEventListener("dragstart", dragStart);
-        tile.addEventListener("dragover", dragOver);
-        tile.addEventListener("dragenter", dragEnter);
-        tile.addEventListener("dragleave", dragLeave);
-        tile.addEventListener("drop", dragDrop);
-        tile.addEventListener("dragend", dragEnd);
-
-        document.getElementById("pieces").append(tile);
+    function changePuzzleImage() {
+        clearPieces();
+        shufflePieces();
+        initializeBoard();
+        createPieces();
     }
-}
 
-
-    // Додати подію на кнопку для зміни зображення пазлу
     document.getElementById("changeBtn").addEventListener("click", function() {
         currentImageUrlIndex = (currentImageUrlIndex + 1) % imageUrls.length;
         changePuzzleImage();
     });
+
+
 }
 
 function initializeBoard() {
+    clearBoard();
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < columns; c++) {
             let tile = document.createElement("img");
-            tile.src = "./images/blank2.jpg";
+            tile.src = "./Images/Normal/Images-1/blank2.jpg";
 
-            // DRAG FUNCTIONALITY
             tile.addEventListener("dragstart", dragStart);
             tile.addEventListener("dragover", dragOver);
             tile.addEventListener("dragenter", dragEnter);
@@ -63,6 +49,7 @@ function initializeBoard() {
 }
 
 function shufflePieces() {
+    pieces = [];
     for (let i = 1; i <= rows * columns; i++) {
         pieces.push(i.toString());
     }
@@ -80,7 +67,6 @@ function createPieces() {
         let tile = document.createElement("img");
         tile.src = imageUrls[currentImageUrlIndex] + pieces[i] + ".jpg";
 
-        // DRAG FUNCTIONALITY
         tile.addEventListener("dragstart", dragStart);
         tile.addEventListener("dragover", dragOver);
         tile.addEventListener("dragenter", dragEnter);
@@ -92,8 +78,19 @@ function createPieces() {
     }
 }
 
-function clearPreviousPuzzles() {
-    document.getElementById("pieces").innerHTML = "";
+function clearBoard() {
+    let board = document.getElementById("board");
+    while (board.firstChild) {
+        board.removeChild(board.firstChild);
+    }
+}
+
+function clearPieces() {
+    let piecesContainer = document.getElementById("pieces");
+    while (piecesContainer.firstChild) {
+        piecesContainer.removeChild(piecesContainer.firstChild);
+    }
+
 }
 
 function dragStart() {
@@ -125,4 +122,34 @@ function dragEnd() {
 
     turns += 1;
     document.getElementById("turns").innerText = turns;
+}
+
+function showGameOptions(rows, columns) {
+    // Створюємо поле гри з вказаними рядками та стовпцями
+    clearBoard();
+    clearPieces();
+    createGameBoard(rows, columns);
+}
+
+function createGameBoard(rows, columns) {
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < columns; c++) {
+            let tile = document.createElement("img");
+            tile.src = "./Images/Normal/Images-1/blank2.jpg";
+
+            tile.addEventListener("dragstart", dragStart);
+            tile.addEventListener("dragover", dragOver);
+            tile.addEventListener("dragenter", dragEnter);
+            tile.addEventListener("dragleave", dragLeave);
+            tile.addEventListener("drop", dragDrop);
+            tile.addEventListener("dragend", dragEnd);
+
+            document.getElementById("board").append(tile);
+        }
+    }
+}
+
+function clearGame() {
+    clearBoard();
+    clearPieces();
 }
